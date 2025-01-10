@@ -1,27 +1,27 @@
 name: Minify CSS
-
 on:
   push:
-    branches: [ main ]
+    branches:
+      - main
     paths:
       - 'phimhub-styles.css'
 
 jobs:
   minify:
     runs-on: ubuntu-latest
-    
     steps:
     - uses: actions/checkout@v3
       with:
+        persist-credentials: false
         fetch-depth: 0
 
     - name: Set up Node.js
       uses: actions/setup-node@v3
       with:
-        node-version: '18'
-        
+        node-version: 18
+
     - name: Install clean-css
-      run: npm install clean-css-cli -g
+      run: npm install -g clean-css-cli
 
     - name: Minify CSS
       run: cleancss -o phimhub.min.css phimhub-styles.css
@@ -31,5 +31,5 @@ jobs:
         git config --global user.name "github-actions[bot]"
         git config --global user.email "github-actions[bot]@users.noreply.github.com"
         git add phimhub.min.css
-        git diff --quiet && git diff --staged --quiet || git commit -m "Auto-generated minified CSS [skip ci]"
-        git push
+        git commit -m "Auto-generated minified CSS [skip ci]"
+        git push https://${{ secrets.GH_PAT }}@github.com/${{ github.repository }}.git HEAD:main
